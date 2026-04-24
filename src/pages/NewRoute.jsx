@@ -92,8 +92,15 @@ export default function NewRoute() {
               <input type="date" value={form.departure_date} onChange={set('departure_date')} required />
             </div>
             <div className="field" style={{ marginBottom: 0 }}>
-              <label className="label">Время</label>
-              <input type="time" value={form.departure_time} onChange={set('departure_time')} required />
+              <label className="label">Время отправления</label>
+              <select value={form.departure_time} onChange={set('departure_time')} required>
+                <option value="">Выберите</option>
+                {Array.from({ length: 24 }, (_, i) => i).map(h => (
+                  <option key={h} value={String(h).padStart(2,'0') + ':00'}>
+                    {String(h).padStart(2,'0') + ':00 – ' + String((h+1)%24).padStart(2,'0') + ':00'}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 
