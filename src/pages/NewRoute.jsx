@@ -145,7 +145,7 @@ export default function NewRoute() {
                     onChange={set('parcel_max_kg')}
                     placeholder="10"
                     min="0.1"
-                    step="0.5"
+                    step="any"
                     required={form.accepts_parcels}
                   />
                 </div>
@@ -157,7 +157,7 @@ export default function NewRoute() {
                     onChange={set('parcel_price_per_kg')}
                     placeholder="2"
                     min="0"
-                    step="0.5"
+                    step="any"
                     required={form.accepts_parcels}
                   />
                 </div>
