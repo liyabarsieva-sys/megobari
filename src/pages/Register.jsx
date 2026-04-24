@@ -8,11 +8,27 @@ const ROLES = [
   { value: 'both',   label: 'И то, и другое' },
 ]
 
+function EyeIcon({ open }) {
+  return open ? (
+    <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+      <circle cx="12" cy="12" r="3"/>
+    </svg>
+  ) : (
+    <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
+      <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/>
+      <path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/>
+      <line x1="1" y1="1" x2="23" y2="23"/>
+    </svg>
+  )
+}
+
 export default function Register() {
   const navigate = useNavigate()
   const [form, setForm] = useState({
     name: '', email: '', password: '', phone: '', role: 'client',
   })
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError]     = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -25,23 +41,20 @@ export default function Register() {
     setError('')
     setLoading(true)
 
-    // 1. Create auth user
-    const { data, error: authErr } = await supabase.auth.signUp({
+    // Передаём имя, телефон и роль в metadata — триггер создаст профиль автоматически
+    const { error: authErr } = await supabase.auth.signUp({
       email: form.email,
       password: form.password,
+      options: {
+        data: {
+          name:  form.name,
+          phone: form.phone,
+          role:  form.role,
+        }
+      }
     })
 
     if (authErr) { setError(authErr.message); setLoading(false); return }
-
-    // 2. Create profile row in public.users
-    const { error: profileErr } = await supabase.from('users').insert({
-      id:    data.user.id,
-      name:  form.name,
-      phone: form.phone,
-      role:  form.role,
-    })
-
-    if (profileErr) { setError(profileErr.message); setLoading(false); return }
 
     navigate('/')
   }
@@ -72,7 +85,28 @@ export default function Register() {
 
           <div className="field">
             <label className="label">Пароль</label>
-            <input type="password" value={form.password} onChange={set('password')} placeholder="Минимум 6 символов" minLength={6} required />
+            <div style={{ position: 'relative' }}>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                value={form.password}
+                onChange={set('password')}
+                placeholder="Минимум 6 символов"
+                minLength={6}
+                required
+                style={{ paddingRight: 44 }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(v => !v)}
+                style={{
+                  position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)',
+                  background: 'none', border: 'none', color: 'var(--text-muted)',
+                  padding: 0, display: 'flex', alignItems: 'center',
+                }}
+              >
+                <EyeIcon open={showPassword} />
+              </button>
+            </div>
           </div>
 
           <div className="field">
